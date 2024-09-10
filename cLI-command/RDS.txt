@@ -1,0 +1,31 @@
+RDSの作成
+
+1. SecretManagerに認証情報を保存する
+2. サブネットグループの作成
+3. RDSインスタンス作成
+
+今回は、マスタユーザ名、マスタパスワードをSecretManagerに保存した認証情報を使用します
+(費用を抑えたい方はマスタユーザ名・マスタパスワードを自己管理し入力してください)
+
+1. 変数の設定
+* シークレット名を設定
+```
+SECRET_NAME="mydbsecret"
+```
+
+* マスタユーザ名・マスタユーザパスワード名を設定
+```
+MASTER_USERNAME="admin"
+MASTER_USER_PASSWORD="mypassword"
+```
+
+2. Secrets Managerに認証情報を保存する
+
+```
+aws secretsmanager create-secret \
+    --name $SECRET_NAME \
+    --description "RDS MySQL Master User credentials" \
+    --secret-string '{"username":"'"$MASTER_USERNAME"'","password":"'"$MASTER_USER_PASSWORD"'"}'
+```
+
+"DBインスタンス名"、"DBインスタンスタイプ"

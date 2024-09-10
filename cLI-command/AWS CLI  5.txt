@@ -1,0 +1,101 @@
+AWS CLIで第5回環境の構築
+
+# ALB構築
+①ターゲットグループの作成
+②ターゲットグループへターゲットの登録
+③ELBの作成
+④リスナー設定
+
+①ターゲットグループの作成
+変数を設定
+
+```
+## ターゲットグループ名
+#設定したいターゲットグループを設定
+TARGET_GROUP_NAME=tushiko-target-cli
+
+## ターゲットグループのプロトコル
+TARGET_GROUP_PROTCOL=HTTP
+
+## ターゲットグループのポート
+TARGET_GROUP_PORT=80
+
+## ヘルスチェックパス
+HTALTH_CHECK_PATH=/healthcheck.html
+
+## ヘルスチェックポート
+HTALTH_CHECK_PORT=80
+
+## ヘルスチェックプロトコル
+HTALTH_CHECK_PROTCOL=HTTP
+
+## ヘルスチェックの間隔(秒)
+HTALTH_CHECK_INTERVAL=30
+
+## ヘルスチェックのタイムアウト値(秒)
+HTALTH_CHECK_TIMEOUT=5
+
+## 正常と判断する閾値
+HTALTHY_THRESHOLD_COUNT=5
+
+## 異常と判断する閾値
+UNHTALTHY_THRESHOLD_COUNT=2
+
+## ターゲットのタイプ(lambdaも指定できるが今回は割愛)
+TARGET_TYPE=ip or instance
+
+## VPCのID
+VPCID=vpc-0fee138d3e0deef81
+
+## ターゲットのIP(ターゲットタイプがipの場合のみ指定)
+TARGET_IP=10.88.0.59
+
+## ターゲットのインスタンスID(ターゲットタイプがinsntaceの場合のみ指定)
+TARGET_ID=i-0808672558492fde8
+
+## ターゲットのポート
+TARGET_PORT=80
+
+## ELBの名前
+ELB_NAME=fk-test-elb-cli
+
+## ELBを作成するサブネットID
+SUBETIDS=subnet-0093d7475de79313b subnet-03fbedc39e6211234
+
+## ELBにアタッチするSGID
+SGIDS=sg-00c78fbf089ace674 sg-02df472801a58f25e
+
+## ELBのスキーマ
+SCHEME=internet-facing or internal
+
+## ELBのタイプ
+ELB_TYPE=application or network
+
+## IPアドレスタイプ
+IP_ADDRESS_TYPE=ipv4
+
+## リスナーのプロトコル(HTTPの場合)
+LISTENER_PROTCOL_HTTP=HTTP
+
+## リスナーのプロトコル(HTTPの場合)
+LISTENER_PORT_HTTP=80
+
+## リスナーのプロトコル(HTTPSの場合)
+LISTENER_PROTCOL_HTTPS=HTTPS
+
+## リスナーのポート(HTTPSの場合)
+LISTENER_PORT_HTTPS=443
+
+## セキュリティポリシー(HTTPSの場合指定)  ※1
+SSL_POLICY=ELBSecurityPolicy-TLS-1-2-Ext-2018-06
+
+## ACMに登録した証明書のARN
+CERTIFICATE_ARN=arn:aws:acm:ap-northeast-1:xxxxxxxxxxxxxx:certificate/68814875-7a52-44
+```
+
+* ターゲットグループの存在確認
+```
+aws elbv2 describe-target-groups --names ${TARGET_GROUP_NAME}
+```
+
+②
