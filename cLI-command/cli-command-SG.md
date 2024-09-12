@@ -3,11 +3,11 @@
 セキュリティグループを作成 (EC2用、RDS用、ALB用)
 * アウトバウンド"すべてのトラフィック"と"0.0.0.0/0"は自動生成のため省略
 
-|構築するセキュリティグループの名称|用途|セキュリティグループの値|
-| ---- | ---- | ---- |
-|tushiko-cli-sg1|EC2 |sg-07daea686a97c95ed|
-|tushiko-cli-sg2|RDS|sg-0dce59b364458f8a1 |
-|tushiko-cli-sg3|ALB |sg-004df7b7482c9da12|
+|構築するセキュリティグループの名称|用途|
+| ---- | ---- | 
+|tushiko-cli-sg1|EC2 |
+|tushiko-cli-sg2|RDS|
+|tushiko-cli-sg3|ALB |
 
 #### EC2のセキュリティグループ
 インバウンド
@@ -67,7 +67,7 @@ EC2_SECURITY_GROUP_NAME='tushiko-cli-sg1'
 * ③セキュリティグループの説明を設定
 ```
 #自身で判別のため任意の説明を設定
-EC2_SECURITY_GROUP_DESCRIPTION='tushiko-cli SecurityGroup1.'
+EC2_SECURITY_GROUP_DESCRIPTION='tushiko-cli SecurityGroup1'
 ```
 * ④VPC IDを設定
 ```
@@ -110,6 +110,10 @@ aws ec2 describe-security-groups \
   --output text
 ```
 
+コンソールにて確認
+![](../images/securitygroup/sg1-1.png)
+![](../images/securitygroup/sg1-2.png)
+
 ## 作成したセキュリティグループにルールを追加する
 今回は、EC2用の"sg-tushiko-cli-sg1"に下記のルールを追加します。
 
@@ -130,8 +134,6 @@ export AWS_DEFAULT_REGION='ap-northeast-1'
 ```
 
 2. 各種変数の指定
-
-"VPCタグ名"、"セキュリティグループ名"、"ルールのタグ名"、"プロトコル"、"ポート番号"、"VPC ID"、"セキュリティグループID"を変数に入れる
 
 * ①VPCタグ名を設定
 ```
@@ -249,20 +251,7 @@ aws ec2 revoke-security-group-ingress \
 #httpからsshに変更
 EC2_SECURITY_GROUP_RULE_TAG_NAME='ssh-local'
 ```
-*④は上記と同じ
-
-* ⑨IPアドレスを設定
-```
-EC2_SECURITY_GROUP_RULE_CIDR=$( curl -s http://checkip.amazonaws.com/ )/32 \
-&& echo ${EC2_SECURITY_GROUP_RULE_CIDR}
-
-#http://checkip.amazonaws.com/ で接続元環境のグローバルIPアドレスを取得することができます。また、CIDR形式にする必要がある。
-```
-* ⑤プロトコルの設定
-```
-EC2_SECURITY_GROUP_RULE_PROTOCOL='tcp'
-```
-
+* ④・⑤は上記と同じ
 * ⑥ポート番号の設定
 ```
 #80番から22番に変更
@@ -279,55 +268,62 @@ EC2_SECURITY_GROUP_RULE_CIDR=$( curl -s http://checkip.amazonaws.com/ )/32 \
 ```
 
 上記の通り、"3. ルール追加"を再度実施
+```
+aws ec2 authorize-security-group-ingress \
+  --group-id ${EC2_SECURITY_GROUP_ID} \
+  --protocol ${EC2_SECURITY_GROUP_RULE_PROTOCOL} \
+  --port ${EC2_SECURITY_GROUP_RULE_PORT} \
+  --cidr ${EC2_SECURITY_GROUP_RULE_CIDR} \
+  --tag-specifications ${STRING_EC2_EC2_SECURITY_GROUP_RULE_TAG}
+```
 
 コンソールにて確認
-![](images/sg-tushiko-cli-sg1.png)
+![](../images/securitygroup/sg1-3.png)
+![](../images/securitygroup/sg1-2.png)
 
-セキュリティグループRDS用に"tushiko-cli-sg2"、ALB用に"tushiko-cli-sg3"を作成する
+### セキュリティグループRDS用に"tushiko-cli-sg2"、ALB用に"tushiko-cli-sg3"を作成する
 
-tushiko-cli-sg2
 #### RDSのセキュリティグループ
 インバウンド
 |タイプ|プロトコル|ポート範囲|ソース|
 | ---- | ---- | ---- | ---- |
 |MYSQL/Aurora|TCP|3306|EC2のセキュリティグループ|
 
-①リージョンを環境変数に指定
+1. リージョンを環境変数に指定
 VPCを作成するリージョンを環境変数に指定。この手順では東京リージョンを指定。
 ```
 export AWS_DEFAULT_REGION='ap-northeast-1'
 ```
 
-②各種変数の指定
-"VPCタグ名"、"セキュリティグループ名"、"ルールのタグ名"、"プロトコル"、"ポート番号”、"VPC ID"、"セキュリティグループID"を変数に入れます。
+2. 各種変数の指定
 
-1. VPCタグ名
+* ①VPCタグ名
 ```
 EC2_VPC_TAG_NAME='tushiko-cli-vpc'
 ```
-2. セキュリティグループ名
+* ②セキュリティグループ名
 ```
 EC2_SECURITY_GROUP_NAME='tushiko-cli-sg2'
 ```
-3. ルールのタグ名
+* ③ルールのタグ名
 ```
 EC2_SECURITY_GROUP_RULE_TAG_NAME='MYSQL/Aurora-local'
 ```
-4. セキュリティグループタグ文字列
+* ④セキュリティグループタグ文字列
 ```
 STRING_EC2_EC2_SECURITY_GROUP_RULE_TAG="ResourceType=security-group-rule,Tags=[{Key=Name,Value=${EC2_SECURITY_GROUP_RULE_TAG_NAME}}]" \
   && echo ${STRING_EC2_EC2_SECURITY_GROUP_RULE_TAG}
 ```
 
-5. プロトコル
+* ⑤プロトコル
 ```
 EC2_SECURITY_GROUP_RULE_PROTOCOL='tcp'
 ```
-6. ポート番号
+* ⑥ポート番号
 ```
 EC2_SECURITY_GROUP_RULE_PORT='3306'
 ```
-7. VPC ID
+* ⑦VPC ID
 ```
 EC2_VPC_ID=$( \
   aws ec2 describe-vpcs \
@@ -340,7 +336,7 @@ EC2_VPC_ID=$( \
 vpc-XXXXXXXXXXXXXXXXX
 ```
 
-8. セキュリティグループID
+* ⑧セキュリティグループID
 ```
 EC2_SECURITY_GROUP_ID=$( \
   aws ec2 describe-security-groups \
@@ -354,12 +350,13 @@ EC2_SECURITY_GROUP_ID=$( \
 #設定したいsgのidが一致しているか確認
 sg-0xxxxxxxxxXXXXXXX
 ```
-9. 許可ソースをEC2のsgを許可するように変数を設定する。
+* ⑨許可ソースをEC2のsgを許可するように変数を設定する。
 ```
 # セキュリティグループのID（3306ポートを許可するEC2用に作成したセキュリティグループID）
 EC2_SOURCE_SECURITY_GROUP_ID='sg-xxxxxxxx'
 ```
-以下のコマンドを実行
+
+3. 以下のコマンドを実行
 ```
 #5行目”--cidr ${EC2_SECURITY_GROUP_RULE_CIDR}"を
 "--source-group ${EC2_SOURCE_SECURITY_GROUP_ID}"に変更
@@ -375,9 +372,12 @@ aws ec2 authorize-security-group-ingress \
 セキュリティグループが設定されているかを確認
 
 コンソール上でも確認。
-![](images/tushiko-cli-sg2.png)
+![](../images/securitygroup/sg2-1.png)
+![](../images/securitygroup/sg2-2.png)
 
 ALBのセキュリティグループに関しては上記の工程を繰り返し実施することで作成。
+* セキュリティグループ名"tushiko-cli-sg3”で作成
 
 コンソール上でも確認。
-![](images/tushiko-cli-sg3.png)
+![](../images/securitygroup/sg3-1.png)
+![](../images/securitygroup/sg3-2.png)
