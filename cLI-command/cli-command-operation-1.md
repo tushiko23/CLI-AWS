@@ -123,6 +123,14 @@ aws ec2 describe-vpcs \
 ![](images/tushiko-cli-vpc.png)
 
 ## IGWの作成
+
+## 行うこと
+1. リージョンを環境変数に指定する
+2. 各種変数インターネットゲートウェイの<タグ名>と<タグ文字列>を指定する
+3. 作成コマンド実行
+4. インターネットゲートウェイの作成確認
+5. 作成したインターネットゲートウェイをVPCにアタッチ
+
 ### 1.リージョンを環境変数に指定する
 
 * インターネットゲートウェイを作成するリージョンを環境変数に指定する。ここでは東京リージョン"ap-northeast-1"を指定
@@ -254,7 +262,7 @@ aws ec2 attach-internet-gateway \
 ```
 成功しても、表示はなし。
 
-### 4.指定したVPCにインターネットゲートウェイがアタッチしているか確認
+### 6.指定したVPCにインターネットゲートウェイがアタッチしているか確認
 ```
 aws ec2 describe-internet-gateways \
   --filters Name=tag:Name,Values=${EC2_INTERNET_GATEWAY_TAG_NAME} \
