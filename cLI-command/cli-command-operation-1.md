@@ -40,9 +40,6 @@ EC2_VPC_CIDR='10.0.0.0/16'
 #ここでは環境変数で記載し自身で設定したタグを確認するためechoコマンドにて出力しています
 STRING_EC2_VPC_TAG="ResourceType=vpc,Tags=[{Key=Name,Value=${EC2_VPC_TAG_NAME}}]" \
 && echo ${STRING_EC2_VPC_TAG}
-#こちらも可
-STRING_EC2_VPC_TAG="ResourceType=vpc,Tags=[{Key=<自身が設定したいKey名>,Value=$＜{自身が設定したいValue名>}]" \
-&& echo ${STRING_EC2_VPC_TAG}
 ```
 これが出力されればOK
 ```
@@ -120,7 +117,32 @@ aws ec2 describe-vpcs \
 ```
 
 コンソール上でも作成確認
-![](images/tushiko-cli-vpc.png)
+![](../images/network/vpc-1.png)
+
+* 作成されたVPCIDも確認
+```
+EC2_VPC_ID=$( \
+  aws ec2 describe-vpcs \
+    --filters Name=tag:Name,Values=${EC2_VPC_TAG_NAME}  \
+    --query 'Vpcs[].VpcId' \
+    --output text \
+) \
+  && echo ${EC2_VPC_ID}
+#以下の値が出ればOK
+vpc-XXXXXXXXXXXXXXXXX
+```
+
+* DNSホスト名が有効になるように修正
+* DNSホストを有効化
+
+```
+aws ec2 modify-vpc-attribute \
+--vpc-id ${EC2_VPC_ID} \
+--enable-dns-hostnames
+```
+
+コンソールでも確認
+![](../images/network/vpc-2.png)
 
 ## IGWの作成
 
@@ -151,11 +173,8 @@ EC2_INTERNET_GATEWAY_TAG_NAME='tushiko-cli-igw'
 
 STRING_EC2_INTERNET_GATEWAY_TAG="ResourceType=internet-gateway,Tags=[{Key=Name,Value=${EC2_INTERNET_GATEWAY_TAG_NAME}}]" \
 && echo ${STRING_EC2_INTERNET_GATEWAY_TAG}
-
-#こちらも可
-STRING_EC2_INTERNET_GATEWAY_TAG="ResourceType=internet-gateway,Tags=[{Key=<自身が設定したいKey名>,Value=＜{自身が設定したいValue名>}]" \
-&& echo ${STRING_EC2_INTERNET_GATEWAY_TAG}
 ```
+
 これが出力されればOK
 ```
 #今回は、Key=Name,Value=tushiko-cli-igwとして設定
@@ -203,7 +222,7 @@ aws ec2 describe-internet-gateways \
 ```
 
 コンソール上でも確認
-![](images/igw-cli-1.png)
+![](../images/network/igw-1.png)
 
 ### 5.作成したインターネットゲートウェイをVPCにアタッチ
 * リージョンを環境変数に指定する
@@ -275,7 +294,7 @@ vpc-XXXXXXXXXXXXXXXXX
 ```
 
 コンソール上でも確認
-![](images/igw-cli-2.png)
+![](../images/network/igw-2.png)
 
 ## Subnetの作成
 今回は、PublicSubnetを2つ PrivateSubnetを2つつくります。
@@ -299,7 +318,7 @@ EC2_VPC_TAG_NAME='tushiko-cli-vpc'
 * ② サブネットのCIDRブロック(自身が設定したいCIDRブロック)を設定。ここでは、"10.0.0.0/20"を設定。
 ```
 #CIDRブロック
-EC2_VPC_CIDR='10.0.0.0/20'
+EC2_SUBNET_CIDR='10.0.0.0/20'
 ```
 * ➂ AZコード（ap-northeast-1a：a、ap-northeast-1c：c）を設定。ここでは、"ap-northeast-1a"を選択。
 ```
@@ -429,7 +448,7 @@ aws ec2 describe-subnets \
 ```
 ```
 #指定したCIDRブロックと一致するかを確認
-10.0.10.0/24
+10.0.0.0/20
 ```
 
 出力される値と指定されたAZが正しいかどうか確認。
@@ -471,7 +490,7 @@ tushiko-cli-public-subnet-c
 ```
 
 コンソールでも確認
-![](images/subnet-cli.png)
+![](../images/network/subnet-1.png)
 
 ## ルートテーブルの作成
 ### ルート構成
@@ -582,7 +601,7 @@ aws ec2 describe-route-tables \
 ```
 
 コンソールで確認
-![](images/routetable1.png)
+![](../images/network/routetable-1.png)
 
 ## ルートテーブルにサブネットを関連付け
 
@@ -685,9 +704,27 @@ subnet-XXXXXXXXXXXXXXXXX   subnet-YYYYYYYYYYYYYYYYY
 * "ap-northwest-1a"に作成した"PrivateSubnet"と”ap-northeast-1c"に作成した"PrivateSubnet"は、プライベートルートテーブルを1つずつ作成し関連付けを行う。
 
 コンソールでも確認
-![](images/pubroute-igw.png)
-![](images/pri-routetable.png)
-![](images/pri-routetable2.png)
+パブリックルートテーブル
+![](../images/network/routetable-2.png)
+![](../images/network/routetable-5.png)
+
+パプリックのルートテーブルのルートを確認(現地点)
+* IGWのルートを次工程で追加します
+![](../images/network/route-public1.png)
+
+プライベートルートテーブル1
+![](../images/network/routetable-3.png)
+![](../images/network/routetable-6.png)
+
+プライベートのルートテーブル1のルートを確認
+![](../images/network/route-private1.png)
+
+プライベートルートテーブル2
+![](../images/network/routetable-4.png)
+![](../images/network/routetable-7.png)
+
+プライベートのルートテーブル2のルートを確認
+![](../images/network/route-private2.png)
 
 ## 5.インターネットへのルート追加 ※パブリックルートテーブルのみ
 ### 1.リージョンを環境変数に指定する
@@ -697,8 +734,6 @@ subnet-XXXXXXXXXXXXXXXXX   subnet-YYYYYYYYYYYYYYYYY
 export AWS_DEFAULT_REGION='ap-northeast-1'
 ```
 ### 2.各種変数を指定する
-
-* "VPCタグ名"、"VPC ID”、”ルートテーブルタグ名"、"ルートテーブルID"、"インターネットゲートウェイタグ名"、”インターネットゲートウェイID"、"宛先アドレスを変数"に指定する。
 
 * ① VPCタグ名(自身が設定したいVPC名)を設定。ここでは、"tushiko-cli-vpc"を設定。
 ```
@@ -797,13 +832,12 @@ aws ec2 describe-route-tables \
 ```
 
 コンソールにて確認
-![](images/pub-routetable-add-igw.png)
-![](images/pubroute-igw.png)
+インターネットゲートウェイのアタッチを確認
+![](../images/network/igw-attached.png)
 
-* SGの作成
-* EC2の作成
-* EC2がS3にアクセスできるようにするためのIAMポリシーとIAMロールを作成
-* RDSの作成
-* ALBの作成
-* S3の作成
+パプリックのルートテーブルのルートを確認
+![](../images/network/route-public1.png)
+
+* 次回SGの作成
+
 
