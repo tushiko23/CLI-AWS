@@ -110,7 +110,7 @@ aws ec2 describe-vpcs \
 2. Tags[?Key == 'Name']: 各VPCのタグの中から、キーが「Name」のタグを見つける。
 3. .Value: その「Name」タグの値を取得する。
 
---output text
+#### --output text
 * 役割: クエリで指定した取得結果をtextで出力する。この場合、"「Name」タグの値"に一致する値を取得する。
 
 「VPCタグ」通りの値が表示されればOK
@@ -143,7 +143,7 @@ export AWS_DEFAULT_REGION='ap-northeast-1'
 ```
 EC2_INTERNET_GATEWAY_TAG_NAME='tushiko-cli-igw'
 ```
-インターネットゲートウェイタグ文字列(自身が設定したいタグをKeyとValueにて設定)を設定。ここでは、Key=Name,Value=
+インターネットゲートウェイタグ文字列(自身が設定したいタグをKeyとValueにて設定)を設定。ここでは、Key=Name,Value=設定したいValue名
 
 ```
 #タグを設定
