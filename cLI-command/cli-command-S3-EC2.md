@@ -203,7 +203,7 @@ EC2_SECURITY_GROUP_ID=$( \
 sg-XXXXXXXXXXXXXXX
 ```
 
-*キーペア
+* キーペア
 ```
 EC2_KEY_PAIR_NAME='TushikocliKeyPair'
 ```
