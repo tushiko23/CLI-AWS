@@ -1,21 +1,23 @@
 # CLIにて第5回課題環境を構築するPart.3
 1. S3バケット作成
 2. IAMロール作成
-3. IAMポリシー作成
-4. IAMポリシーをIAMロールにアタッチ
-5. EC2作成
-6. EC2をIAMロールにアタッチ
-7. RDSを作成
+3. IAMポリシー(今回はIAMロールのインラインポリシー)を作成
+4. EC2にSSH接続するキーペアの作成
+5. EC2をIAMロールにアタッチ
+6. EC2作成
+7. (オプション)ElasticIPの作成とEC2に関連付け
 
 1. S3バケットを作成する
 ```
 aws s3 mb s3://<バケット名>
 #今回は、tushiko-cliで作成。「既存名でないものを選ぶ」
 aws s3 mb s3://tushiko-cli
+#以下が変えればOK
+make_bucket: バケット名
 ```
 
 コンソールで確認
-![](images/tushiko-cli-bucket.png)
+![](../images/s3-ec2/S3.png)
 
 2. S3にアクセスできるようにIAMロールを作成
 ```
@@ -36,7 +38,30 @@ aws iam create-role \
     ]
 }'
 ```
-
+以下が返ればOK
+```
+{
+    "Role": {
+        "Path": "/",
+        "RoleName": "ロール名",
+        "RoleId": "××××××××××",
+        "Arn": "arn:aws:iam::ユーザID:role/ロール名",
+        "CreateDate": "日時",
+        "AssumeRolePolicyDocument": {
+            "Version": "2012-10-17",
+            "Statement": [
+                {
+                    "Effect": "Allow",
+                    "Principal": {
+                        "Service": "ec2.amazonaws.com"
+                    },
+                    "Action": "sts:AssumeRole"
+                }
+            ]
+        }
+    }
+}
+```
 3. IANポリシーを作成
 今回は、インラインポリシーで作成
 ```
@@ -47,14 +72,14 @@ aws iam put-role-policy \
   --role-name tushiko-cli-role \
   --policy-name tushiko-cli-policy \
   --policy-document '{ "Version": "2012-10-17", "Statement": [ { "Action": [ "s3:GetObject", "s3:PutObject", "s3:ListBucket", "s3:DeleteObject", "s3:GetBucketLocation" ], "Resource": "arn:aws:s3:::*", "Effect": "Allow" }, { "Action": "*", "Resource": [ "arn:aws:s3:::tushiko-cli", "arn:aws:s3:::tushiko-cli/*" ], "Effect": "Allow" } ] }'
+
 ```
 
 コンソール上でIAMロール・IAMポリシーの作成を確認。IAMポリシーがIAMロールにアタッチされているか確認。
 
-![](images/tushiko-cli-role.png)
-![](images/tushiko-cli-role1.png)
-![](images/tushiko-cli-role-attathed.png)
-![](images/tushiko-cli-policy.png)
+![](../images/s3-ec2/role-1.png)
+![](../images/s3-ec2/role-2.png)
+![](../images/s3-ec2/policy1.png)
 
 4. EC2作成
 EC2にアクセスするためのキーペアを作成
@@ -67,17 +92,20 @@ aws ec2 create-key-pair --key-name TushikocliKeyPair --query 'KeyMaterial' --out
 #pemファイルに読み込み権限を与える
 chmod 400 TushikocliKeyPair.pem
 ```
+自分のディレクトリにあるか確認
+![](../images/s3-ec2/keypair1.png)
+コンソールでも作成確認
+![](../images/s3-ec2/keypair2.png)
 
 5. EC2インスタンスの起動
 AZ:ap-northeast-1aのパブリックサブネットにインターネットからの接続確認に使うためのEC2を作成。
 
-①リージョンを環境変数に指定
+* ①リージョンを環境変数に指定
 VPCを作成するリージョンを環境変数に指定。この手順では東京リージョンを指定。
 ```
 export AWS_DEFAULT_REGION='ap-northeast-1'
 ```
-②各種変数の指定
-<EC2インスタンスタグ名>・<タグ文字列>、<AMIイメージID>、<インスタンスタイプ>、<サブネットID>、<キーペア名><IAMロール>を指定します。
+* ②各種変数の指定
 
 * EC2インスタンスタグ名
 ```
@@ -115,6 +143,7 @@ ami-XXXXXXXXXXXXXXX
 * インスタンスタイプ
 ```
 #自身が設定したいインスタンスタイプ
+#無料枠を使い切ったためt2.microよりスペックが高く安価な"t3.micro"を使用
 EC2_INSTANCE_TYPE="t3.micro"
 ```
 * VPCタグ名
@@ -177,7 +206,7 @@ sg-XXXXXXXXXXXXXXX
 EC2_KEY_PAIR_NAME='TushikocliKeyPair'
 ```
 
-6. IAMロールを作成したインスタンスに割り当てる
+5. IAMロールを作成したインスタンスEC2に割り当てる
 * IAMロールを変数指定
 ```
 IAM_ROLE_NAME="tushiko-cli-role"
@@ -186,6 +215,17 @@ IAM_ROLE_NAME="tushiko-cli-role"
 * IAMロールが含まれるインスタンスプロファイルを作成
 ```
 aws iam create-instance-profile --instance-profile-name $IAM_ROLE_NAME-instance-profile
+#以下の値が返ればOK
+{
+    "InstanceProfile": {
+        "Path": "/",
+        "InstanceProfileName": "インスタンスプロファイル名",
+        "InstanceProfileId": "××××××××××××",
+        "Arn":"arn:aws:iam::アカウントID:instance-profile/インスタンスプロファイル名",
+        "CreateDate": "日時",
+        "Roles": []
+    }
+}
 ```
 * IAMロールをインスタンスプロファイルにアタッチする
 ```
@@ -195,8 +235,10 @@ aws iam add-role-to-instance-profile \
 ```
 * --iam-instance-profileオプションでIAMロールをアタッチ
   
+コンソールでも確認
+！[](../images/s3-ec2/profile-1.png)
 
-1. EC2インスタンス起動
+6. EC2インスタンス起動
 以下のコマンドを実行してEC2インスタンスを起動する。
 ```
 # "--associate-public-ip-address"オプションでパブリックIPアドレスを割り当てる
@@ -212,9 +254,12 @@ aws ec2 run-instances \
   --associate-public-ip-address
 ```
 
-サブネットのパブリックIPアドレス自動割り当て設定を有効になっていなかったため"パブリック IPv4 DNS”が付与されず。
+![](../images/s3-ec2/ec2-1.png)
+![](../images/s3-ec2/ec2-2.png)
 
-* サブネットのパブリックIPアドレス自動割り当て設定を有効にする
+サブネットのパブリックIPアドレス自動割り当て設定を有効になっていなかったため"パブリック IPv4 DNS”が付与されない場合。
+
+1. サブネットのパブリックIPアドレス自動割り当て設定を有効にする
 ```
 #サブネットIDを変数化
 SUBNET_ID=”設定されたサブネットID"
@@ -223,10 +268,8 @@ aws ec2 modify-subnet-attribute \
     --subnet-id $SUBNET_ID \
     --map-public-ip-on-launch
 ```
-解消されず
 
-その2
-パブリック IPv4 DNSがつかないのは、VPC内のDNSホスト名が有効になっていなかったため
+2. パブリック IPv4 DNSがつかないのは、VPC内のDNSホスト名が有効になっていなかったため
 
 * DNSホスト名が有効になるように修正
 * DNSホストを有効化
@@ -237,29 +280,38 @@ aws ec2 modify-vpc-attribute \
 ```
 
 SSH接続して動作確認。
+![](../images/s3-ec2/ssh.png)
 
-
-## オプションElasitcIPを取得し、作成したEC2インスタンスに割り当てる
+7. オプションElasitcIPを取得し、作成したEC2インスタンスに割り当てる
 
 * ElasticIPを作成
-```
- aws ec2 allocate-address --domain vpc
-```
-変数なしでEC2にアタッチする場合
 
-* 作成したElasticIPのAllocation IDを変数にて保存
+* 作成したElasticIPのAllocation IDを変数にて保存して作成
 ```
 ALLOC_ID=$(aws ec2 allocate-address --domain vpc --query 'AllocationId' --output text)
 ```
+ElasticIPはデフォルトで5個に設定されているため、制限を超えるとエラーが出る。
+```
+ALLOC_ID=$(aws ec2 allocate-address --domain vpc --query 'AllocationId' --output text)
+
+An error occurred (AddressLimitExceeded) when calling the AllocateAddress operation: The maximum number of addresses has been reached.
+
+```
+→ElasticIPを開放して、5個いかにするか、使用数上限を引き上げてもらう
 
 Elastic IPのAllocation IDとは
 
 Elastic IP (EIP) がAWSリソースに割り当てられる際にAWSが付与する一意の識別子。Elastic IPを管理する際に使用したり、EC2にアタッチしたりするときに使用する。
 
+コンソールにて確認
+![](../images/s3-ec2/elastic-ip1.png)
+
 * 直前で作成されたインスタンスのidを取得するコマンドでインスタンスの確認をする
 
 * --query: JSON形式の出力から特定の情報を抜き出すために使用。
-* --output text: 出力をテキスト形式で表示し、インスタンスIDのみ取得。3. 直近に作成したインスタンスのIDを取得する
+* --output text: 出力をテキスト形式で表示し、インスタンスIDのみ取得。
+
+* 直近に作成したインスタンスのIDを取得する
 直近に作成したインスタンスのIDを取得したい場合は、launch-time に基づいてソートし、最新のインスタンスIDを取得する。
 
 ```
@@ -279,11 +331,49 @@ INSTANCE_ID_NAME= i-×××××××××××××
 
 ```
 aws ec2 associate-address \
-  --instance-id $INSTANCE_ID \
+  --instance-id $INSTANCE_ID_NAME \
   --allocation-id $ALLOC_ID
+```
+以下の値がでればOK！
+```
+{
+    "AssociationId": "eipassoc-×××××××××××××"
+}
 ```
 インスタンスに関連付けられたか確認
 ```
 echo "Elastic IP $ALLOC_ID assigned to Instance $INSTANCE_ID"
+#以下の値がでればOK
+Elastic IP eipalloc-××××××××××××××× assigned to Instance 
 ```
+
+コンソール上でも確認
+![](../images/s3-ec2/elastic-ip2.png)
+
+#####　ElasicIPをインスタンスからデタッチし、開放する
+
+1. ElasicIPをインスタンスからデタッチする
+* Elastic IPのAssocation IDを取得
+```
+aws ec2 describe-addresses \
+  --allocation-ids $ALLOC_ID
+``` 
+* ElasicIPをインスタンスからデタッチ
+
+```
+aws ec2 disassociate-address \
+  --association-id <association_id>
+```
+コンソールで確認 
+![](../images/s3-ec2/elastic-ip1.png)
+
+* ElasticIPの開放
+```
+aws ec2 release-address \
+  --allocation-id $ALLOC_ID
+```
+
+コンソールにて確認
+![](../images/s3-ec2/elastic-ip3.png)
+
 
