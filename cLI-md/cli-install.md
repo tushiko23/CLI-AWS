@@ -4,9 +4,8 @@
    * 使用しているPC Chromebook OS バージョン: 128.0.6613.118（Official Build） （64 ビット）2024年9月6日現在
    * LinuxOS Debian系　Debian GNU/Linux 12 (bookworm)　Architecture: x86-64 2024年9月6日現在
   
-   ![](images/ChromeOS-check1.png)
-   ![](images/ChromeOS-check2.png)
-
+   ![](../images/install/ChromeOS-check1.png)
+   ![](../images/install/ChromeOS-check2.png)
 
 * CLI操作に関して、必要なもの
    * CLI操作できるポリシーをIAMユーザーにアタッチ
@@ -26,7 +25,7 @@ sudo ./aws/install
 #CLIのインストールを確認。バージョンが出ればOK
 aws --version
 ```
-![](images/aws-cli-install1.png)
+![](../images/install/aws-cli-install1.png)
 
 * 認証情報「credentials」を設定
 ```
@@ -41,8 +40,8 @@ ls
 * マネジメントコンソール右上の"myアカウント”から"セキュリティ認証情報を選択"、"AWS IAM認証情報"から"アクセスキーの作成及び有効化"されているか確認
 * 作成されていない・またはアクセスキー・シークレットアクセスキーを紛失した場合は再作成を行ってください
 
-![](images/access-key-check1.png)
-![](images/access-key-check2.png)
+![](../images/install/access-key-check1.png)
+![](../images/install/access-key-check2.png)
 
 * credentialsに"アクセスキー”、”シークレットアクセスキー"を設定する
 ```
@@ -72,7 +71,8 @@ aws sts get-caller-identity
 }
 ```
 
-![](images/myaccout-check.png)
+![](../images/install/myaccout-check.png)
+
 以下が表示されていればOK！
 
 ## 実際にコマンドを入力しAWS上にリソースが作られてるか確認
@@ -83,50 +83,50 @@ aws sts get-caller-identity
 
 #### S3バケットを作成(バケット名は既存のバケット名以外のバケット名を設定する)
 * 既存のバケット名(sample.bucket)で作成すると以下のエラーが表示
-![](images/s3-mb-error.png)
+![](../images/install/s3-mb-error.png)
 
 ```
 #"tushiko-tf"でバケット作成
 aws s3 mb s3://tushiko-tf
 ```
-![](images/s3-mb1.png)
+![](../images/install/s3-mb1.png)
 
 実際に確認
-![](images/bucket-managementconsole.png)
+![](../images/install/bucket-managementconsole.png)
 
 #### オブジェクトがバケットにアップロードされるかを確認
 ```
 #オブジェクト"apple.jpg"を"tushiko-tf"バケットにアップロード
 aws s3 cp apple.jpg s3://tushiko-tf
 ```
-![](images/upload-apple.png)
+![](../images/install/upload-apple.png)
 
 実際に確認
-![](images/tushiko-tf-upload.png)
+![](../images/install/tushiko-tf-upload.png)
 
 #### オブジェクトをバケットから削除されることを確認
 ```
 #オブジェクト"apple.jpg"を"tushiko-tf"バケットから削除
 aws s3 rm apple.jpg s3://tushiko-tf
 ```
-![](images/apple-delete.png)
+![](../images/install/apple-delete.png)
 
 実際に確認
-![](images/delete-object.png)
+![](../images/install/delete-object.png)
 
 #### S3バケットの削除を確認
 ```
 #"tushiko-tf"バケットを削除
 aws s3 rb s3://tushiko-tf
 ```
-![](images/s3-rb1.png)
+![](../images/install/s3-rb1.png)
 
 実際に確認
-![](images/S3-rm-bucket.png)
+![](../images/install/S3-rm-bucket.png)
 
 参照
 CLIでAWSリソースを作成する
-terraformでAWSリソースを作成する
+
 
 
 
