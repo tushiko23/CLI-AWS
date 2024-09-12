@@ -11,7 +11,7 @@
 
 ## VPCの作成
 1. リージョンを環境変数に指定する
-2. 各種変数<VPCタグ>と<CIDRブロック>を指定する
+2. 各種変数を指定する
 3. 作成コマンド実行
 4. 作成確認
 
@@ -22,19 +22,19 @@
 export AWS_DEFAULT_REGION='ap-northeast-1'
 ```
 
-### 2.各種変数<VPCタグ>と<CIDRブロック>を指定する
-* VPCタグ名(自身が設定したいVPC名)を設定。ここでは、"tushiko-cli-vpc"を設定。
+### 2.各種変数を指定する
+* ①VPCタグ名(自身が設定したいVPC名)を設定。ここでは、"tushiko-cli-vpc"を設定。
 ```
 #VPCタグ
 EC2_VPC_TAG_NAME='tushiko-cli-vpc'
 ```
-* CIDRブロック(自身が設定したいCIDRブロック)を設定。ここでは、"10.0.0.0/16"を設定。
+* ②CIDRブロック(自身が設定したいCIDRブロック)を設定。ここでは、"10.0.0.0/16"を設定。
 ```
 #CIDRブロック
 EC2_VPC_CIDR='10.0.0.0/16'
 ```
 
-VPCタグ文字列(自身が設定したいタグをKeyとValueにて設定)ここでは、Key=Name、Value＝EC2_VPC_TAG_NAME(tushiko-cli-vpc)を設定。
+* ③VPCタグ文字列(自身が設定したいタグをKeyとValueにて設定)ここでは、Key=Name、Value＝EC2_VPC_TAG_NAME(tushiko-cli-vpc)を設定。
 ```
 #タグを設定
 #ここでは環境変数で記載し自身で設定したタグを確認するためechoコマンドにて出力しています
@@ -126,7 +126,7 @@ aws ec2 describe-vpcs \
 
 ## 行うこと
 1. リージョンを環境変数に指定する
-2. 各種変数インターネットゲートウェイの<タグ名>と<タグ文字列>を指定する
+2. 各種変数を指定する
 3. 作成コマンド実行
 4. インターネットゲートウェイの作成確認
 5. 作成したインターネットゲートウェイをVPCにアタッチ
@@ -138,7 +138,7 @@ aws ec2 describe-vpcs \
 export AWS_DEFAULT_REGION='ap-northeast-1'
 ```
 
-### 2.各種変数インターネットゲートウェイの<タグ名>と<タグ文字列>を指定する
+### 2.各種変数を指定する
 * インターネットタグ名(自身が設定したいインターネットゲートウェイ名)を設定。ここでは、"tushiko-cli-igw"を設定。
 ```
 EC2_INTERNET_GATEWAY_TAG_NAME='tushiko-cli-igw'
