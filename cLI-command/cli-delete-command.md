@@ -1,26 +1,35 @@
-CLI削除コマンド
+# CLI削除コマンド
 
-ALB
+### ALB
+
 1. ロードバランサーの削除
 2. ターゲットグループの削除
-RDS
+
+### RDS
+
 3. RDSの停止・RDSの削除
 4. サブネットグループの削除
 5. RDSに保存されたSecrets Managerの認証情報を削除
-EC2
+
+### EC2
+
 6. EC2の削除
 7. インスタンスプロファイルに関連付けられたIAMロールの削除
 8. インスタンスプロファイルの削除
 9. キーペアの削除
-SG
+
+### SG
+
 10. セキュリティグループの削除
-NETWORK
+
+### NETWORK
+
 11. ルートテーブルからサブネットの関連付けを削除し、ルートテーブル・サブネットを削除する
 12. IGWをVPCからデタッチし、IGWとVPCを削除
 13. EC2にアタッチしたIAMロールとIAMポリシーの削除
 14. S3バケットの削除
 
-##
+## ALB
 
 1. ロードバランサーの削除
 
@@ -52,6 +61,8 @@ aws elbv2 delete-target-group \
 --target-group-arn $(aws elbv2 describe-target-groups --query "TargetGroups[].TargetGroupArn" \--output text --name ${TARGET_GROUP_NAME})
 #何も返ってこず、コマンドが実行されれば成功
 ```
+
+## RDS
 
 3. RDSの停止・RDSの削除
 
@@ -136,6 +147,7 @@ aws secretsmanager delete-secret --secret-id ${SECRETS_MANAGER_NAME}
 #SECRETS_MANAGER_NAME="シークレット名"
 aws secretsmanager delete-secret --secret-id ${SECRETS_MANAGER_NAME} --force-delete-without-recovery
 ```
+## EC2
 
 6. EC2の削除
 
@@ -211,6 +223,8 @@ aws ec2 delete-key-pair --key-pair-id ${KEY_PAIR_ID}
 KEY_PAIR_NAME="キーペア名"
 aws ec2 delete-key-pair --key-name ${KEY_PAIR_NAME}
 ```
+## SG
+
 
 10. セキュリティグループの削除
 
@@ -273,6 +287,8 @@ aws ec2 revoke-security-group-ingress \
 RDSを削除して、
 
 あとは、通常通り削除すればOK
+
+## NETWORK
 
 11.ルートテーブルからサブネットの関連付けを削除し、ルートテーブル・サブネットを削除する
 
