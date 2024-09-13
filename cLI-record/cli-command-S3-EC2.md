@@ -1,5 +1,4 @@
 # CLIにて第5回課題環境を構築するPart.3
-
 1. S3バケット作成
 2. IAMロール作成
 3. IAMポリシー(今回はIAMロールのインラインポリシー)を作成
@@ -8,7 +7,6 @@
 6. EC2作成
 7. (オプション)ElasticIPの作成とEC2に関連付け
 
-### バケット作成
 1. S3バケットを作成する
 ```
 aws s3 mb s3://<バケット名>
@@ -203,7 +201,7 @@ EC2_SECURITY_GROUP_ID=$( \
 sg-XXXXXXXXXXXXXXX
 ```
 
-* キーペア
+*キーペア
 ```
 EC2_KEY_PAIR_NAME='TushikocliKeyPair'
 ```
