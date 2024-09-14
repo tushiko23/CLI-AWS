@@ -291,6 +291,7 @@ aws secretsmanager get-secret-value \
 ![](../images/rds/SecretsManager1.png)
 
 * RDSの認証情報がSecret Managerになっているか確認
+
 ![](../images/rds/SecretsManager2.png)
 
 * Secret Managerで取得したパスワードで接続できるか確認
