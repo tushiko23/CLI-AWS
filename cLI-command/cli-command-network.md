@@ -850,4 +850,3 @@ aws ec2 describe-route-tables \
 [Amazon VPCをAWS CLIで構築する手順③](https://zenn.dev/amarelo_n24/articles/dee73d9ce90072)
 
 [Amazon VPCをAWS CLIで構築する手順④](https://zenn.dev/amarelo_n24/articles/f66a1757344f9e)
-
