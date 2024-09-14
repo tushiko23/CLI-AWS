@@ -18,16 +18,16 @@
 
 ## 各種操作はこちらから
 
-1. [CLIをインストール](../cLI-command/cli-install.md)
+1. [CLIをインストール](cLI-command/cli-install.md)
 
-2. [VPC環境を作成](../cLI-command/cli-command-network.md)
+2. [VPC環境を作成](cLI-command/cli-command-network.md)
 
-3. [SGを作成](../cLI-command/cli-command-SG.md)
+3. [SGを作成](cLI-command/cli-command-SG.md)
 
-4. [S3・EC2の作成](../cLI-command/cli-command-S3-EC2.md)
+4. [S3・EC2の作成](cLI-command/cli-command-S3-EC2.md)
 
-5. [ALBの作成](../cLI-command/cli-command-ALB.md)
+5. [ALBの作成](cLI-command/cli-command-ALB.md)
 
-6. [RDSの作成](../cLI-command/cli-command-RDS.md)
+6. [RDSの作成](cLI-command/cli-command-RDS.md)
 
-7. [リソースを削除する](../cLI-command/cli-delete-command.md)
+7. [リソースを削除する](cLI-command/cli-delete-command.md)
