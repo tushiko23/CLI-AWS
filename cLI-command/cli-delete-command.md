@@ -1,5 +1,8 @@
-# CLI削除コマンド
+# おまけ:CLI削除コマンド
+#### 以下の構成図のリソースを削除します
+![](../images/kouseizu/all-kouseizu.png)
 
+##構成図
 ### ALB
 
 1. ロードバランサーの削除
@@ -454,3 +457,17 @@ aws s3 rb s3://<バケット名>
 ```
 aws s3 rb s3://<バケット名> --force
 ```
+
+#### 前回まではこちら
+
+[CLIをインストール](../cLI-command/cli-install.md)
+
+[VPC環境を作成](../cLI-command/cli-command-network.md)
+
+[SGを作成](../cLI-command/cli-command-SG.md)
+
+[S3・EC2の作成](../cLI-command/cli-command-S3-EC2.md)
+
+[ALBの作成](../cLI-command/cli-command-ALB.md)
+
+[RDSの作成](../cLI-command/cli-command-RDS.md)
