@@ -1,6 +1,7 @@
 # CLIにて第5回課題環境を構築するPart.1
 
 ## 構成図
+![](../images/kouseizu/network1.png)
 
 ## 行うこと
 1. VPCを作成。
@@ -305,9 +306,9 @@ vpc-XXXXXXXXXXXXXXXXX
 ```
 export AWS_DEFAULT_REGION='ap-northeast-1'
 ```
-### 2.各種変数<VPCタグ>と<CIDRブロック>と<AZ>と<サブネットタグ名>と<VPCタグ>を指定する
+### 2.各種変数を指定する
 
-作成したVPC上に"ap-northeast-1a"で"Public Subnet"を作成する場合。(サブネットのCIDRブロックは10.0.0.0/20を指定)
+作成したVPC上に"ap-northeast-1a"、CIDRブロック"10.0.0.0/20"を指定して"Public Subnet"を作成する場合。
 
 * ① VPCタグ名(自身が設定したいVPC名)を設定。ここでは、"tushiko-cli-vpc"を設定。
 ```
@@ -516,7 +517,7 @@ Local(自ネットワーク)の他に、インターネットゲートウェイ�
 ```
 export AWS_DEFAULT_REGION='ap-northeast-1'
 ```
-### 2.各種変数<VPCタグ>と<ルートテーブルのタグ名>と<タグ文字列>とVPC IDを指定する
+### 2.各種変数を指定する
 
 作成したVPC上に"Public Subnet"に関連付けるルートテーブルを作成する場合。
 
@@ -838,6 +839,15 @@ aws ec2 describe-route-tables \
 パプリックのルートテーブルのルートを確認
 ![](../images/network/route-public1.png)
 
-* 次回SGの作成
+#### 次回はこちら→[SGの作成](../cLI-command/cli-command-SG.md)
 
+参考サイト
+
+[VPCをパラメータを使用して作成する](https://zenn.dev/uepon/articles/bda7075c5dc356)
+
+[Amazon VPCをAWS CLIで構築する手順①](https://zenn.dev/amarelo_n24/articles/35cb14a057ecf1)
+
+[Amazon VPCをAWS CLIで構築する手順③](https://zenn.dev/amarelo_n24/articles/dee73d9ce90072)
+
+[Amazon VPCをAWS CLIで構築する手順④](https://zenn.dev/amarelo_n24/articles/f66a1757344f9e)
 
