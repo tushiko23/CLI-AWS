@@ -1,6 +1,7 @@
 # CLIにて第5回課題環境を構築するPart.5
 ## 構成図
-[](../images/kouseizu/alb-kouseizu.png)
+![](../images/kouseizu/alb-kouseizu.png)
+
 ## ALB構築
 ### 行うこと
 1. ターゲットグループの作成
