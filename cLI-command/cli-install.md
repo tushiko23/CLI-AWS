@@ -123,9 +123,3 @@ aws s3 rb s3://tushiko-tf
 
 実際に確認
 ![](../images/install/S3-rm-bucket.png)
-
-参照
-CLIでAWSリソースを作成する
-terraformでAWSリソースを作成する
-
-
