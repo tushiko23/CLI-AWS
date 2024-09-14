@@ -1,6 +1,9 @@
 # CLIにて第5回課題環境を構築するPart.2
 
-セキュリティグループを作成 (EC2用、RDS用、ALB用)
+## 構成図
+![](../images/kouseizu/sg-kouseizu1.png)
+
+### セキュリティグループを作成 (EC2用、RDS用、ALB用)
 * アウトバウンド"すべてのトラフィック"と"0.0.0.0/0"は自動生成のため省略
 
 |構築するセキュリティグループの名称|用途|
@@ -51,7 +54,6 @@ VPCを作成するリージョンを環境変数に指定します。この手�
 export AWS_DEFAULT_REGION='ap-northeast-1'
 ```
 2. 各種変数の指定
-"VPCタグ名"、"セキュリティグループ名"、"セキュリティグループの説明"、"VPC ID"を変数に入れます。
 
 * ①VPCタグ名を設定。
 ```
@@ -83,14 +85,14 @@ vpc-XXXXXXXXXXXXXXXXX
 ```
 
 3. セキュリティグループ作成
-以下のコマンドを実行して、セキュリティグループを作成します。
+以下のコマンドを実行して、セキュリティグループを作成。
 ```
 aws ec2 create-security-group \
 --group-name ${EC2_SECURITY_GROUP_NAME} \
 --description "${EC2_SECURITY_GROUP_DESCRIPTION}" \
 --vpc-id ${EC2_VPC_ID}
 ```
-成功したら以下のように表示されます。
+成功したら以下のように表示。
 ```
 {
     "GroupId": "sg-XXXXXXXXXXXXXXXXX"
@@ -99,9 +101,9 @@ aws ec2 create-security-group \
 
 4. 作成確認
 
-以下のコマンドを実行して、セキュリティグループが正しく作成されたことを確認します。
+以下のコマンドを実行して、セキュリティグループが正しく作成されたことを確認。
 
-指定のセキュリティグループ名とVPC IDで抽出したJSONから、セキュリティグループのグループ名をテキスト形式で表示させます。
+指定のセキュリティグループ名とVPC IDで抽出したJSONから、セキュリティグループのグループ名をテキスト形式で表示させる。
 ```
 aws ec2 describe-security-groups \
   --filters Name=vpc-id,Values=${EC2_VPC_ID} \
@@ -115,7 +117,7 @@ aws ec2 describe-security-groups \
 ![](../images/securitygroup/sg1-2.png)
 
 ## 作成したセキュリティグループにルールを追加する
-今回は、EC2用の"sg-tushiko-cli-sg1"に下記のルールを追加します。
+今回は、EC2用の"sg-tushiko-cli-sg1"に下記のルールを追加。
 
 インバウンド
 |タイプ|プロトコル|ポート範囲|ソース|
@@ -267,7 +269,7 @@ EC2_SECURITY_GROUP_RULE_CIDR=$( curl -s http://checkip.amazonaws.com/ )/32 \
 ×××.×××.×××.×××/32
 ```
 
-上記の通り、"3. ルール追加"を再度実施
+上記の通り、3. ルール追加を再度実施
 ```
 aws ec2 authorize-security-group-ingress \
   --group-id ${EC2_SECURITY_GROUP_ID} \
@@ -381,3 +383,10 @@ ALBのセキュリティグループに関しては上記の工程を繰り返�
 コンソール上でも確認。
 ![](../images/securitygroup/sg3-1.png)
 ![](../images/securitygroup/sg3-2.png)
+
+#### 次回はこちら→[S3・EC2を作成](../cLI-command/cli-command-S3-EC2.md)
+
+#### 過去の記事→[CLIでVPCを作成](../cLI-command/cli-command-network.md)
+
+#### 参考サイト
+[Amazon VPCをAWS CLIで構築する手順②](https://zenn.dev/amarelo_n24/articles/30cb58cad805e8)
