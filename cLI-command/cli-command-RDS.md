@@ -1,5 +1,8 @@
 # CLIにて第5回課題環境を構築するPart.4
 ## RDSの作成
+## 構成図
+![](../images/kouseizu/rds-kouseizu.png)
+
 ### 行うこと
 1. サブネットグループ作成
 2. RDS作成の変数を指定
@@ -241,20 +244,20 @@ RDSインスタンスが生成するデータベースログ（例: エラーロ
 削除保護機能を有効にするオプション
 
 
-必須ではありませんが、RDS作成後に状況に応じて実施
+#### 必須ではありませんが、RDS作成後に状況に応じて実施
 ### SecretManagerに認証情報を保存し、RDSに関連付ける
 
 マスタユーザ名、マスタパスワードをSecretManagerに保存した認証情報を使用する
 (費用を抑えたい方はマスタユーザ名・マスタパスワードを自己管理し入力してください)
 
 
-1. Secrets Managerを使用してパスワードの管理が有効にする
+1. Secrets Managerを使用したパスワードの管理を有効にする
 
 * 作成したRDSのDBの識別子を変数化
 ```
 DB_INSTANCE_IDENTIFIER="mydbinstance"
 ```
-Secrets Managerを使用してパスワードの管理が有効にする
+Secrets Managerを使用したパスワードの管理を有効にする
 ```
 aws rds modify-db-instance \
     --db-instance-identifier "$DB_INSTANCE_IDENTIFIER" \
@@ -292,3 +295,16 @@ aws secretsmanager get-secret-value \
 
 * Secret Managerで取得したパスワードで接続できるか確認
 ![](../images/rds/SecretsManager3.png)
+
+#### 次回はこちら→[ALBの作成](../cLI-command/cli-command-ALB.md)
+#### 前回はこちら→[S3・EC2の作成](../cLI-command/cli-command-S3-EC2.md)
+
+#### 参考サイト
+
+[AWS CLI を使って RDS を作成する (自分用メモ)](https://qiita.com/propella/items/807ec930c9f6c9f6d5b8)
+[](https://en-junior.com/rds_cli/#index_id6)
+
+[AWS CLIでRDSインスタンスを作成してEC2から接続する方法](https://en-junior.com/rds_cli/#index_id6)
+
+[CLIによる「RDS」構築](https://cloud5.jp/cli-rds/)
+
