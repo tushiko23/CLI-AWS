@@ -1,4 +1,9 @@
 # CLIにて第5回課題環境を構築するPart.3
+
+## 構成図 
+![](../images/kouseizu/s3-ec2-kouseizu1.png)
+
+## 行うこと
 1. S3バケット作成
 2. IAMロール作成
 3. IAMポリシー(今回はIAMロールのインラインポリシー)を作成
@@ -7,6 +12,7 @@
 6. EC2作成
 7. (オプション)ElasticIPの作成とEC2に関連付け
 
+##
 1. S3バケットを作成する
 ```
 aws s3 mb s3://<バケット名>
@@ -375,5 +381,19 @@ aws ec2 release-address \
 
 コンソールにて確認
 ![](../images/s3-ec2/elastic-ip3.png)
+
+#### 次回はこちら→[RDSの作成](../cLI-command/cli-command-RDS.md)
+#### 前回はこちら→[SGを作成](../cLI-command/cli-command-SG.md)
+
+#### 参考サイト
+[Amazon VPCをAWS CLIで構築する手順⑤](https://zenn.dev/amarelo_n24/articles/0703c4807dde4d)
+
+[開発環境のEC2にIAM Roleをアタッチし、AWS CLIを使用できる様にする](https://zenn.dev/hikary/articles/f62464a2501727)
+
+[AWS CLI で IAM ロールを作成する](https://zenn.dev/y_u_t_a/articles/58257348c3754d)
+
+[【入門】AWS CLIでEC2インスタンスを立ち上げてみた！](https://www.isoroot.jp/blog/3188/)
+
+[#2 AWS CLIでEC2を作成する](https://qiita.com/kokichi8/items/20d52fb266677f0e88f3)
 
 
