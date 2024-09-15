@@ -30,7 +30,9 @@ EC2_VPC_ID=$( \
     --output text \
 ) \
   && echo ${EC2_VPC_ID}
-#指定したVPC IDがでればOK
+```
+指定したVPC IDがでればOK
+```
 vpc-×××××××××××××××
 ```
 
@@ -52,8 +54,10 @@ EC2_SUBNET_ID=$( \
     --output text \
 ) \
 && echo ${EC2_SUBNET_ID}
+```
 
-#指定したサブネットIDが出ればOK
+指定したサブネットIDが出ればOK
+```
 subnet-×××××××××××××
 ```
 
@@ -62,10 +66,10 @@ subnet-×××××××××××××
 SUBNET_IDS="subnet-xxxxxxxx subnet-yyyyyyyy"
 ```
 
-サブネットグループ作成
+* サブネットグループ作成
 
+--db-subnet-group-descriptionオプションでサブネットグループの説明
 ```
-#--db-subnet-group-descriptionオプションでサブネットグループの説明
 aws rds create-db-subnet-group \
     --db-subnet-group-name $SUBNET_GROUP_NAME \
     --db-subnet-group-description "My RDS Subnet Group"\
@@ -128,19 +132,19 @@ DB_ENGINE="mysql"
 DB_NAME="mydatabase"
 ```
 * ⑤"マスタユーザ名"
+    * 設定したいマスタユーザ名
 ```
-#設定したいマスタユーザ名
 MASTER_USERNAME="admin"
 ```
 * ⑥"マスタパスワード名"
+    * 設定したいマスタパスワード名
 ```
-#設定したいマスタパスワード名
 MASTER_USER_PASSWORD="mypassword"
 ```
 
 * ⑦セキュリティグループ
+    * 自身で作成したセキュリティグループ名
 ```
-#自身で作成したセキュリティグループ名
 EC2_SECURITY_GROUP_NAME='tushiko-cli-sg2'
 ```
 セキュリティグループID
@@ -159,8 +163,8 @@ sg-XXXXXXXXXXXXXXX
 ```
 
 * VPCタグ名
+    * 自身が設定したvpcタグ
 ```
-#自身が設定したvpcタグ
 EC2_VPC_TAG_NAME='tushiko-cli-vpc'
 ```
 * ⑧VPC ID
@@ -212,8 +216,8 @@ aws rds create-db-instance \
 ![](../images/rds/rds-2.png)
 
 * ec2にmysqlクライアントをインストールし、接続確認
+    * MySQLクライアントをインストール
 ```
-#MySQLクライアントをインストール
 sudo yum update
 sudo yum install -y mysql
 #RDSへ接続
@@ -308,4 +312,3 @@ aws secretsmanager get-secret-value \
 [AWS CLIでRDSインスタンスを作成してEC2から接続する方法](https://en-junior.com/rds_cli/#index_id6)
 
 [CLIによる「RDS」構築](https://cloud5.jp/cli-rds/)
-
