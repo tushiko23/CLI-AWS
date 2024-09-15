@@ -355,6 +355,13 @@ aws elbv2 describe-listeners \
 コンソールでも確認
 ![](../images/alb/load-balancer2.png)
 
+* nginxをインストールし、起動し、ALBをhealthy状態にする
+  * AmazonLinux2022にnginxをインストール
+  * nginxを起動し、ALBの状態確認
+```
+sudo amazon-linux-extras install nginx1
+sudo systemctl start nginx
+```
 ヘルスチェックで異常なしを確認。
 ![](../images/alb/health-check.png)
 
