@@ -25,26 +25,31 @@ export AWS_DEFAULT_REGION='ap-northeast-1'
 
 ### 2.各種変数を指定する
 * ①VPCタグ名(自身が設定したいVPC名)を設定。ここでは、"tushiko-cli-vpc"を設定。
+* VPCタグ
 ```
-#VPCタグ
 EC2_VPC_TAG_NAME='tushiko-cli-vpc'
 ```
 * ②CIDRブロック(自身が設定したいCIDRブロック)を設定。ここでは、"10.0.0.0/16"を設定。
+* CIDRブロック
 ```
-#CIDRブロック
 EC2_VPC_CIDR='10.0.0.0/16'
 ```
 
 * ③VPCタグ文字列(自身が設定したいタグをKeyとValueにて設定)ここでは、Key=Name、Value＝EC2_VPC_TAG_NAME(tushiko-cli-vpc)を設定。
+
+* タグを設定
+* ここでは環境変数で記載し自身で設定したタグを確認するためechoコマンドにて出力しています
 ```
-#タグを設定
-#ここでは環境変数で記載し自身で設定したタグを確認するためechoコマンドにて出力しています
 STRING_EC2_VPC_TAG="ResourceType=vpc,Tags=[{Key=Name,Value=${EC2_VPC_TAG_NAME}}]" \
 && echo ${STRING_EC2_VPC_TAG}
 ```
 これが出力されればOK
 ```
-#今回は、Key=Name,Value=tushiko-cli-vpcとして設定
+vpc-XXXXXXXXXXXX
+```
+
+* 今回は、Key=Name,Value=tushiko-cli-vpcとして設定
+```
 ResourceType=vpc,Tags=[{Key=Name,Value=tushiko-cli-vpc}]
 ```
 
@@ -129,7 +134,9 @@ EC2_VPC_ID=$( \
     --output text \
 ) \
   && echo ${EC2_VPC_ID}
-#以下の値が出ればOK
+```
+以下の値が出ればOK
+```
 vpc-XXXXXXXXXXXXXXXXX
 ```
 
@@ -168,17 +175,17 @@ EC2_INTERNET_GATEWAY_TAG_NAME='tushiko-cli-igw'
 ```
 インターネットゲートウェイタグ文字列(自身が設定したいタグをKeyとValueにて設定)を設定。ここでは、Key=Name,Value=設定したいValue名
 
-```
 #タグを設定
 #ここでは環境変数で記載し自身で設定したタグを確認するためechoコマンドにて出力しています
-
+```
 STRING_EC2_INTERNET_GATEWAY_TAG="ResourceType=internet-gateway,Tags=[{Key=Name,Value=${EC2_INTERNET_GATEWAY_TAG_NAME}}]" \
 && echo ${STRING_EC2_INTERNET_GATEWAY_TAG}
 ```
 
 これが出力されればOK
+今回は、Key=Name,Value=tushiko-cli-igwとして設定
+
 ```
-#今回は、Key=Name,Value=tushiko-cli-igwとして設定
 ResourceType=internet-gateway,Tags=[{Key=Name,Value=<自身が設定したigw名>}]
 ```
 
@@ -311,14 +318,15 @@ export AWS_DEFAULT_REGION='ap-northeast-1'
 作成したVPC上に"ap-northeast-1a"、CIDRブロック"10.0.0.0/20"を指定して"Public Subnet"を作成する場合。
 
 * ① VPCタグ名(自身が設定したいVPC名)を設定。ここでは、"tushiko-cli-vpc"を設定。
+* VPCタグ
 ```
-#VPCタグ
 EC2_VPC_TAG_NAME='tushiko-cli-vpc'
 ```
 
 * ② サブネットのCIDRブロック(自身が設定したいCIDRブロック)を設定。ここでは、"10.0.0.0/20"を設定。
+
+* CIDRブロック
 ```
-#CIDRブロック
 EC2_SUBNET_CIDR='10.0.0.0/20'
 ```
 * ➂ AZコード（ap-northeast-1a：a、ap-northeast-1c：c）を設定。ここでは、"ap-northeast-1a"を選択。
@@ -340,8 +348,9 @@ EC2_SUBNET_TAG_NAME="tushiko-cli-"${EC2_SUBNET_TYPE}"-subnet-"${EC2_AZ_CODE} \
 EC2_SUBNET_TAG_NAME="自身が設定するタグ名" \
 && echo ${EC2_SUBNET_TAG_NAME}
 ```
+
+自身が設定したタグ名の表示を確認
 ```
-#自身が設定したタグ名の表示を確認
 tushiko-cli-public-subnet-a
 ```
 
@@ -352,8 +361,8 @@ tushiko-cli-public-subnet-a
 EC2_AZ_NAME=${AWS_DEFAULT_REGION}${EC2_AZ_CODE} \
 && echo ${EC2_AZ_NAME}
 ```
+自身が設定したAZの表示を確認
 ```
-#自身が設定したAZの表示を確認
 ap-northeast-1a
 ```
 
@@ -362,8 +371,8 @@ ap-northeast-1a
 STRING_EC2_SUBNET_TAG="ResourceType=subnet,Tags=[{Key=Name,Value=${EC2_SUBNET_TAG_NAME}}]" \
 && echo ${STRING_EC2_SUBNET_TAG}
 ```
+自身が設定したKey,Valueの値が出力されることを確認
 ```
-#自身が設定したKey,Valueの値が出力されることを確認
 ResourceType=subnet,Tags=[{Key=Name,Value=tushiko-cli-public-subnet-a}]
 ```
 
@@ -434,8 +443,8 @@ aws ec2 describe-subnets \
   --output text
 ```
 出力された値と指定したサブネット名が一致するか確認
+* 指定したサブネット名と一致するかを確認
 ```
-#指定したサブネット名と一致するかを確認
 tushiko-cli-public-subnet-a
 ```
 出力された値と指定したCIDRブロックが正しいか確認
@@ -447,8 +456,9 @@ aws ec2 describe-subnets \
   --query "Subnets[].CidrBlock" \
   --output text
 ```
+
+指定したCIDRブロックと一致するかを確認
 ```
-#指定したCIDRブロックと一致するかを確認
 10.0.0.0/20
 ```
 
@@ -460,8 +470,9 @@ aws ec2 describe-subnets \
   --query "Subnets[].AvailabilityZone" \
   --output text
 ```
+
+指定したAZと一致するか確認
 ```
-#指定したAZと一致するか確認
 ap-northeast-1a
 ```
 
@@ -482,8 +493,8 @@ aws ec2 describe-subnets \
   --output text
 ```
 作成に成功すると、４つのサブネットが表示される
+* 自身で指定したサブネットが作成されているか確認。
 ```
-＃自身で指定したサブネットが作成されているか確認。
 tushiko-cli-public-subnet-a
 tushiko-cli-private-subnet-a
 tushiko-cli-private-subnet-c
@@ -522,8 +533,8 @@ export AWS_DEFAULT_REGION='ap-northeast-1'
 作成したVPC上に"Public Subnet"に関連付けるルートテーブルを作成する場合。
 
 * ① VPCタグ名(自身が設定したいVPC名)を設定。ここでは、"tushiko-cli-vpc"を設定。
+* VPCタグ
 ```
-#VPCタグ
 EC2_VPC_TAG_NAME='tushiko-cli-vpc'
 ```
 * ② ルートテーブルのタグ名を設定。ここでは、"tushiko-cli-vpc-public-route-table"を設定。
@@ -537,9 +548,9 @@ EC2_ROUTE_TABLE_TAG_NAME='tushiko-cli-vpc-public-route-table'
 STRING_EC2_ROUTE_TABLE_TAG="ResourceType=route-table,Tags=[{Key=Name,Value=${EC2_ROUTE_TABLE_TAG_NAME}}]" \
 && echo ${STRING_EC2_ROUTE_TABLE_TAG}
 ```
-指定された"Key”と"Value"が出るか確認する
+* 指定された"Key”と"Value"が出るか確認する
+* 正しい"Key”と"Value"の出力を確認
 ```
-#正しい"Key”と"Value"の出力を確認
 ResourceType=route-table,Tags=[{Key=Name,Value=tushiko-cli-vpc}]
 ```
 * ④作成されたVPC IDを設定
@@ -653,8 +664,8 @@ EC2_ROUTE_TABLE_ID=$( \
 ```
 
 ⑤サブネットタグ名を設定
+* ルートテーブルに関連付けたい自身が作成したサブネット名を設定
 ```
-#ルートテーブルに関連付けたい自身が作成したサブネット名を設定
 EC2_SUBNET_TAG_NAME='tushiko-cli-public-subnet-a'
 ```
 ⑥サブネットIDを設定
@@ -667,7 +678,9 @@ EC2_SUBNET_ID=$( \
     --output text \
 ) \
 && echo ${EC2_SUBNET_ID}
-#指定されたSubnetが出力できるかを確認
+```
+指定されたSubnetが出力できるかを確認
+```
 subnet-×××××××××××××××××
 ```
 
@@ -777,8 +790,8 @@ rtb-XXXXXXXXXXXXXXXXX
 ```
 
 * ⑤インターネットゲートウェイタグ名を設定
+* 自身で作成したigwを設定する
 ```
-#自身で作成したigwを設定する
 EC2_INTERNET_GATEWAY_TAG_NAME='tushiko-cli-igw'
 ```
 
@@ -791,7 +804,9 @@ EC2_INTERNET_GATEWAY_ID=$( \
     --output text \
 ) \
 && echo ${EC2_INTERNET_GATEWAY_ID}
-#作成したigwが合致しているか確認
+```
+作成したigwが合致しているか確認
+```
 igw-XXXXXXXXXXXXXXXXX
 ```
 
