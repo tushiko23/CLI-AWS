@@ -49,26 +49,26 @@
 ## セキュリティグループを作成
 
 1. リージョンを環境変数に指定
-VPCを作成するリージョンを環境変数に指定します。この手順では東京リージョンを指定します。
+VPCを作成するリージョンを環境変数に指定します。この手順では東京リージョンを指定。
 ```
 export AWS_DEFAULT_REGION='ap-northeast-1'
 ```
 2. 各種変数の指定
 
 * ①VPCタグ名を設定。
+* 自身で設定するVPCを設定
 ```
-#自身で設定するVPCを設定
 EC2_VPC_TAG_NAME='tushiko-cli-vpc'
 ```
 * ②セキュリティグループ名を設定
+* 自身で設定する"sg"を設定
 ```
-#自身で設定する"sg"を設定
 EC2_SECURITY_GROUP_NAME='tushiko-cli-sg1'
 ```
 
 * ③セキュリティグループの説明を設定
+* 自身で判別のため任意の説明を設定
 ```
-#自身で判別のため任意の説明を設定
 EC2_SECURITY_GROUP_DESCRIPTION='tushiko-cli SecurityGroup1'
 ```
 * ④VPC IDを設定
@@ -80,7 +80,9 @@ EC2_VPC_ID=$( \
    --output text \
 ) \
 && echo ${EC2_VPC_ID}
-
+```
+以下の値が返ってくればOK!
+```
 vpc-XXXXXXXXXXXXXXXXX
 ```
 
@@ -92,6 +94,7 @@ aws ec2 create-security-group \
 --description "${EC2_SECURITY_GROUP_DESCRIPTION}" \
 --vpc-id ${EC2_VPC_ID}
 ```
+
 成功したら以下のように表示。
 ```
 {
@@ -174,7 +177,10 @@ EC2_VPC_ID=$( \
    --output text \
 ) \
 && echo ${EC2_VPC_ID}
+```
 
+以下の値が出ればOK!
+```
 vpc-XXXXXXXXXXXXXXXXX
 ```
 
@@ -188,7 +194,10 @@ EC2_SECURITY_GROUP_ID=$( \
     --output text \
 ) \
 && echo ${EC2_SECURITY_GROUP_ID}
-#追加したいsg-idが出ることを確認
+``` 
+
+* 追加したいsg-idが出ることを確認
+```
 sg-0xxxxxxxxxXXXXXXX
 ```
 * ⑨CIDRブロックを設定
@@ -235,8 +244,9 @@ aws ec2 authorize-security-group-ingress \
 ```
 
 * 間違えてルールを追加したり、不要なルールを削除したい場合は、以下のコマンドを実行する。
+
+* インバウンドのsgを削除
 ```
-#インバウンドのsgを削除
 aws ec2 revoke-security-group-ingress \
   --group-id ${EC2_SECURITY_GROUP_ID} \
   --protocol ${EC2_SECURITY_GROUP_RULE_PROTOCOL} \
@@ -249,8 +259,8 @@ aws ec2 revoke-security-group-ingress \
 
 * ①・②は上記と同じ。
 * ③ルールのタグ名を設定
+* httpからsshに変更
 ```
-#httpからsshに変更
 EC2_SECURITY_GROUP_RULE_TAG_NAME='ssh-local'
 ```
 * ④・⑤は上記と同じ
@@ -265,7 +275,9 @@ EC2_SECURITY_GROUP_RULE_PORT='22'
 ```
 EC2_SECURITY_GROUP_RULE_CIDR=$( curl -s http://checkip.amazonaws.com/ )/32 \
 && echo ${EC2_SECURITY_GROUP_RULE_CIDR}
-#出力値がマイIPになっているか確認
+```
+* 出力値がマイIPになっているか確認
+```
 ×××.×××.×××.×××/32
 ```
 
@@ -334,7 +346,9 @@ EC2_VPC_ID=$( \
    --output text \
 ) \
 && echo ${EC2_VPC_ID}
-#設定したい"vpc-id"と一致するか確認
+```
+設定したい"vpc-id"と一致するか確認
+```
 vpc-XXXXXXXXXXXXXXXXX
 ```
 
@@ -348,21 +362,23 @@ EC2_SECURITY_GROUP_ID=$( \
     --output text \
 ) \
 && echo ${EC2_SECURITY_GROUP_ID}
-
-#設定したいsgのidが一致しているか確認
+```
+設定したいsgのidが一致しているか確認
+```
 sg-0xxxxxxxxxXXXXXXX
 ```
 * ⑨許可ソースをEC2のsgを許可するように変数を設定する。
+
+    * セキュリティグループのID（3306ポートを許可するEC2用に作成したセキュリティグループID）
 ```
-# セキュリティグループのID（3306ポートを許可するEC2用に作成したセキュリティグループID）
 EC2_SOURCE_SECURITY_GROUP_ID='sg-xxxxxxxx'
 ```
 
 3. 以下のコマンドを実行
-```
-#5行目”--cidr ${EC2_SECURITY_GROUP_RULE_CIDR}"を
-"--source-group ${EC2_SOURCE_SECURITY_GROUP_ID}"に変更
 
+* 5行目”--cidr ${EC2_SECURITY_GROUP_RULE_CIDR}"を
+"--source-group ${EC2_SOURCE_SECURITY_GROUP_ID}"に変更
+```
 aws ec2 authorize-security-group-ingress \
   --group-id ${EC2_SECURITY_GROUP_ID} \
   --protocol ${EC2_SECURITY_GROUP_RULE_PROTOCOL} \
