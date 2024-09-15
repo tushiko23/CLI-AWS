@@ -26,8 +26,8 @@
 
 4. [S3・EC2の作成](cLI-command/cli-command-S3-EC2.md)
 
-5. [ALBの作成](cLI-command/cli-command-ALB.md)
+5. [RDSの作成](cLI-command/cli-command-RDS.md)
 
-6. [RDSの作成](cLI-command/cli-command-RDS.md)
+6. [ALBの作成](cLI-command/cli-command-ALB.md)
 
 7. [リソースを削除する](cLI-command/cli-delete-command.md)
