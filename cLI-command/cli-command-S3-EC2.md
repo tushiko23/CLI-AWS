@@ -1,5 +1,9 @@
 # CLIにて第5回課題環境を構築するPart.3
 
+## 構成図 
+![](../images/kouseizu/s3-ec2-kouseizu1.png)
+
+## 行うこと
 1. S3バケット作成
 2. IAMロール作成
 3. IAMポリシー(今回はIAMロールのインラインポリシー)を作成
@@ -8,13 +12,17 @@
 6. EC2作成
 7. (オプション)ElasticIPの作成とEC2に関連付け
 
-### バケット作成
+##
 1. S3バケットを作成する
 ```
 aws s3 mb s3://<バケット名>
-#今回は、tushiko-cliで作成。「既存名でないものを選ぶ」
+```
+今回は、tushiko-cliで作成。「既存名でないものを選ぶ」
+```
 aws s3 mb s3://tushiko-cli
-#以下が変えればOK
+```
+以下が変えればOK
+```
 make_bucket: バケット名
 ```
 
@@ -66,15 +74,14 @@ aws iam create-role \
 ```
 3. IANポリシーを作成
 今回は、インラインポリシーで作成
-```
-#--role-nameにて作成したrole名を指定。今回は、"tushiko-cli-role"に設定
-#--role-nameにて任意のrole名を指定。今回は、"tushiko-cli-policy"に設定
 
+* --role-nameにて作成したrole名を指定。今回は、"tushiko-cli-role"に設定
+* --role-nameにて任意のrole名を指定。今回は、"tushiko-cli-policy"に設定
+```
 aws iam put-role-policy \
   --role-name tushiko-cli-role \
   --policy-name tushiko-cli-policy \
   --policy-document '{ "Version": "2012-10-17", "Statement": [ { "Action": [ "s3:GetObject", "s3:PutObject", "s3:ListBucket", "s3:DeleteObject", "s3:GetBucketLocation" ], "Resource": "arn:aws:s3:::*", "Effect": "Allow" }, { "Action": "*", "Resource": [ "arn:aws:s3:::tushiko-cli", "arn:aws:s3:::tushiko-cli/*" ], "Effect": "Allow" } ] }'
-
 ```
 
 コンソール上でIAMロール・IAMポリシーの作成を確認。IAMポリシーがIAMロールにアタッチされているか確認。
@@ -86,12 +93,13 @@ aws iam put-role-policy \
 4. EC2作成
 EC2にアクセスするためのキーペアを作成
 
-```
-#aws ec2 create-key-pair --key-name "キーペア名" --query 'KeyMaterial' --output text > "キーペア名".pem
 
-aws ec2 create-key-pair --key-name TushikocliKeyPair --query 'KeyMaterial' --output text > TushikocliKeyPair.pem
-#作業ディレクトリにpemファイルがダウンロードされていれば成功
-#pemファイルに読み込み権限を与える
+* aws ec2 create-key-pair --key-name "キーペア名" --query 'KeyMaterial' --output text > "キーペア名".pem
+
+* aws ec2 create-key-pair --key-name TushikocliKeyPair --query 'KeyMaterial' --output text > TushikocliKeyPair.pem
+* 作業ディレクトリにpemファイルがダウンロードされていれば成功
+    * pemファイルに読み込み権限を与える
+```
 chmod 400 TushikocliKeyPair.pem
 ```
 自分のディレクトリにあるか確認
@@ -110,18 +118,19 @@ export AWS_DEFAULT_REGION='ap-northeast-1'
 * ②各種変数の指定
 
 * EC2インスタンスタグ名
+    * 自身が設定したいEC2インスタンスタグ名
+    * ここでは"tushiko-cli-ec2-httpserver"に設定。
 ```
-#自身が設定したいEC2インスタンスタグ名
-#ここでは"tushiko-cli-ec2-httpserver"に設定。
 EC2_INSTANCE_TAG_NAME='tushiko-cli-ec2-httpserver'
 ```
 * EC2インスタンスタグ文字列
+    * 自身が設定したい"Key名”、”タグ名”を設定
 ```
-#自身が設定したい"Key名”、”タグ名”を設定
 STRING_TAG_CONF_INSTANCE="ResourceType=instance,Tags=[{Key=Name,Value=${EC2_INSTANCE_TAG_NAME}}]" \
   && echo ${STRING_TAG_CONF_INSTANCE}
-
-#以下の表示でKeyとValueを確認
+```
+以下の表示でKeyとValueを確認
+```
 ResourceType=instance,Tags=[{Key=Name,Value=tushiko-cli-ec2-httpserver}]
 ```
 
@@ -138,19 +147,20 @@ EC2_INSTANCE_IMAGE_ID=$( \
     --output text \
 ) \
 && echo ${EC2_INSTANCE_IMAGE_ID}
-
-#ami-idを習得できればOK
+```
+ami-idを習得できればOK
+```
 ami-XXXXXXXXXXXXXXX
 ```
 * インスタンスタイプ
+    * 自身が設定したいインスタンスタイプ
+    * 無料枠を使い切ったためt2.microよりスペックが高く安価な"t3.micro"を使用
 ```
-#自身が設定したいインスタンスタイプ
-#無料枠を使い切ったためt2.microよりスペックが高く安価な"t3.micro"を使用
 EC2_INSTANCE_TYPE="t3.micro"
 ```
 * VPCタグ名
+    * 自身が設定したvpcタグ
 ```
-#自身が設定したvpcタグ
 EC2_VPC_TAG_NAME='tushiko-cli-vpc'
 ```
 * VPC ID
@@ -162,7 +172,9 @@ EC2_VPC_ID=$( \
     --output text \
 ) \
   && echo ${EC2_VPC_ID}
-#指定したVPC IDがでればOK
+```
+指定したVPC IDがでればOK
+```
 vpc-×××××××××××××××
 ```
 * サブネットタグ名
@@ -198,8 +210,9 @@ EC2_SECURITY_GROUP_ID=$( \
     --output text \
 ) \
 && echo ${EC2_SECURITY_GROUP_ID}
-
-#指定されたsg-idが出るか確認
+```
+指定されたsg-idが出るか確認
+```
 sg-XXXXXXXXXXXXXXX
 ```
 
@@ -217,7 +230,9 @@ IAM_ROLE_NAME="tushiko-cli-role"
 * IAMロールが含まれるインスタンスプロファイルを作成
 ```
 aws iam create-instance-profile --instance-profile-name $IAM_ROLE_NAME-instance-profile
-#以下の値が返ればOK
+```
+以下の値が返ればOK
+```
 {
     "InstanceProfile": {
         "Path": "/",
@@ -236,15 +251,16 @@ aws iam add-role-to-instance-profile \
     --role-name $IAM_ROLE_NAME
 ```
 * --iam-instance-profileオプションでIAMロールをアタッチ
-  
+
 コンソールでも確認
+
 ！[](../images/s3-ec2/profile-1.png)
 
 6. EC2インスタンス起動
 以下のコマンドを実行してEC2インスタンスを起動する。
-```
-# "--associate-public-ip-address"オプションでパブリックIPアドレスを割り当てる
 
+* "--associate-public-ip-address"オプションでパブリックIPアドレスを割り当てる
+```
 aws ec2 run-instances \
   --image-id ${EC2_INSTANCE_IMAGE_ID} \
   --instance-type ${EC2_INSTANCE_TYPE} \
@@ -262,10 +278,13 @@ aws ec2 run-instances \
 サブネットのパブリックIPアドレス自動割り当て設定を有効になっていなかったため"パブリック IPv4 DNS”が付与されない場合。
 
 1. サブネットのパブリックIPアドレス自動割り当て設定を有効にする
+
+* サブネットIDを変数化
 ```
-#サブネットIDを変数化
 SUBNET_ID=”設定されたサブネットID"
-#"--map-public-ip-on-launchコマンド"で自動化を有効化
+```
+* "--map-public-ip-on-launchコマンド"で自動化を有効化
+```
 aws ec2 modify-subnet-attribute \
     --subnet-id $SUBNET_ID \
     --map-public-ip-on-launch
@@ -297,9 +316,9 @@ ElasticIPはデフォルトで5個に設定されているため、制限を超�
 ALLOC_ID=$(aws ec2 allocate-address --domain vpc --query 'AllocationId' --output text)
 
 An error occurred (AddressLimitExceeded) when calling the AllocateAddress operation: The maximum number of addresses has been reached.
-
 ```
-→ElasticIPを開放して、5個いかにするか、使用数上限を引き上げてもらう
+
+* ElasticIPを開放して、5個いかにするか、使用数上限を引き上げてもらう
 
 Elastic IPのAllocation IDとは
 
@@ -324,8 +343,8 @@ aws ec2 describe-instances \
 
 2. 関連するINSTANCE_IDを変数化する
 
+* INSTANCE_ID_NAME= <作成したインスタンスID>
 ```
-INSTANCE_ID_NAME= <作成したインスタンスID>
 INSTANCE_ID_NAME= i-×××××××××××××
 ```
 
@@ -345,14 +364,16 @@ aws ec2 associate-address \
 インスタンスに関連付けられたか確認
 ```
 echo "Elastic IP $ALLOC_ID assigned to Instance $INSTANCE_ID"
-#以下の値がでればOK
+```
+以下の値がでればOK
+```
 Elastic IP eipalloc-××××××××××××××× assigned to Instance 
 ```
 
 コンソール上でも確認
 ![](../images/s3-ec2/elastic-ip2.png)
 
-#####　ElasicIPをインスタンスからデタッチし、開放する
+#### ElasicIPをインスタンスからデタッチし、開放する
 
 1. ElasicIPをインスタンスからデタッチする
 * Elastic IPのAssocation IDを取得
@@ -378,4 +399,16 @@ aws ec2 release-address \
 コンソールにて確認
 ![](../images/s3-ec2/elastic-ip3.png)
 
+#### 次回はこちら→[RDSの作成](../cLI-command/cli-command-RDS.md)
+#### 前回はこちら→[SGを作成](../cLI-command/cli-command-SG.md)
 
+#### 参考サイト
+[Amazon VPCをAWS CLIで構築する手順⑤](https://zenn.dev/amarelo_n24/articles/0703c4807dde4d)
+
+[開発環境のEC2にIAM Roleをアタッチし、AWS CLIを使用できる様にする](https://zenn.dev/hikary/articles/f62464a2501727)
+
+[AWS CLI で IAM ロールを作成する](https://zenn.dev/y_u_t_a/articles/58257348c3754d)
+
+[【入門】AWS CLIでEC2インスタンスを立ち上げてみた！](https://www.isoroot.jp/blog/3188/)
+
+[#2 AWS CLIでEC2を作成する](https://qiita.com/kokichi8/items/20d52fb266677f0e88f3)

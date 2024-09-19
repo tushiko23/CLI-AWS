@@ -1,6 +1,9 @@
 # CLIにて第5回課題環境を構築するPart.2
 
-セキュリティグループを作成 (EC2用、RDS用、ALB用)
+## 構成図
+![](../images/kouseizu/sg-kouseizu1.png)
+
+### セキュリティグループを作成 (EC2用、RDS用、ALB用)
 * アウトバウンド"すべてのトラフィック"と"0.0.0.0/0"は自動生成のため省略
 
 |構築するセキュリティグループの名称|用途|
@@ -46,27 +49,26 @@
 ## セキュリティグループを作成
 
 1. リージョンを環境変数に指定
-VPCを作成するリージョンを環境変数に指定します。この手順では東京リージョンを指定します。
+VPCを作成するリージョンを環境変数に指定します。この手順では東京リージョンを指定。
 ```
 export AWS_DEFAULT_REGION='ap-northeast-1'
 ```
 2. 各種変数の指定
-"VPCタグ名"、"セキュリティグループ名"、"セキュリティグループの説明"、"VPC ID"を変数に入れます。
 
 * ①VPCタグ名を設定。
+* 自身で設定するVPCを設定
 ```
-#自身で設定するVPCを設定
 EC2_VPC_TAG_NAME='tushiko-cli-vpc'
 ```
 * ②セキュリティグループ名を設定
+* 自身で設定する"sg"を設定
 ```
-#自身で設定する"sg"を設定
 EC2_SECURITY_GROUP_NAME='tushiko-cli-sg1'
 ```
 
 * ③セキュリティグループの説明を設定
+* 自身で判別のため任意の説明を設定
 ```
-#自身で判別のため任意の説明を設定
 EC2_SECURITY_GROUP_DESCRIPTION='tushiko-cli SecurityGroup1'
 ```
 * ④VPC IDを設定
@@ -78,19 +80,22 @@ EC2_VPC_ID=$( \
    --output text \
 ) \
 && echo ${EC2_VPC_ID}
-
+```
+以下の値が返ってくればOK!
+```
 vpc-XXXXXXXXXXXXXXXXX
 ```
 
 3. セキュリティグループ作成
-以下のコマンドを実行して、セキュリティグループを作成します。
+以下のコマンドを実行して、セキュリティグループを作成。
 ```
 aws ec2 create-security-group \
 --group-name ${EC2_SECURITY_GROUP_NAME} \
 --description "${EC2_SECURITY_GROUP_DESCRIPTION}" \
 --vpc-id ${EC2_VPC_ID}
 ```
-成功したら以下のように表示されます。
+
+成功したら以下のように表示。
 ```
 {
     "GroupId": "sg-XXXXXXXXXXXXXXXXX"
@@ -99,9 +104,9 @@ aws ec2 create-security-group \
 
 4. 作成確認
 
-以下のコマンドを実行して、セキュリティグループが正しく作成されたことを確認します。
+以下のコマンドを実行して、セキュリティグループが正しく作成されたことを確認。
 
-指定のセキュリティグループ名とVPC IDで抽出したJSONから、セキュリティグループのグループ名をテキスト形式で表示させます。
+指定のセキュリティグループ名とVPC IDで抽出したJSONから、セキュリティグループのグループ名をテキスト形式で表示させる。
 ```
 aws ec2 describe-security-groups \
   --filters Name=vpc-id,Values=${EC2_VPC_ID} \
@@ -115,7 +120,7 @@ aws ec2 describe-security-groups \
 ![](../images/securitygroup/sg1-2.png)
 
 ## 作成したセキュリティグループにルールを追加する
-今回は、EC2用の"sg-tushiko-cli-sg1"に下記のルールを追加します。
+今回は、EC2用の"sg-tushiko-cli-sg1"に下記のルールを追加。
 
 インバウンド
 |タイプ|プロトコル|ポート範囲|ソース|
@@ -172,7 +177,10 @@ EC2_VPC_ID=$( \
    --output text \
 ) \
 && echo ${EC2_VPC_ID}
+```
 
+以下の値が出ればOK!
+```
 vpc-XXXXXXXXXXXXXXXXX
 ```
 
@@ -186,7 +194,10 @@ EC2_SECURITY_GROUP_ID=$( \
     --output text \
 ) \
 && echo ${EC2_SECURITY_GROUP_ID}
-#追加したいsg-idが出ることを確認
+``` 
+
+* 追加したいsg-idが出ることを確認
+```
 sg-0xxxxxxxxxXXXXXXX
 ```
 * ⑨CIDRブロックを設定
@@ -233,8 +244,9 @@ aws ec2 authorize-security-group-ingress \
 ```
 
 * 間違えてルールを追加したり、不要なルールを削除したい場合は、以下のコマンドを実行する。
+
+* インバウンドのsgを削除
 ```
-#インバウンドのsgを削除
 aws ec2 revoke-security-group-ingress \
   --group-id ${EC2_SECURITY_GROUP_ID} \
   --protocol ${EC2_SECURITY_GROUP_RULE_PROTOCOL} \
@@ -247,8 +259,8 @@ aws ec2 revoke-security-group-ingress \
 
 * ①・②は上記と同じ。
 * ③ルールのタグ名を設定
+* httpからsshに変更
 ```
-#httpからsshに変更
 EC2_SECURITY_GROUP_RULE_TAG_NAME='ssh-local'
 ```
 * ④・⑤は上記と同じ
@@ -263,11 +275,13 @@ EC2_SECURITY_GROUP_RULE_PORT='22'
 ```
 EC2_SECURITY_GROUP_RULE_CIDR=$( curl -s http://checkip.amazonaws.com/ )/32 \
 && echo ${EC2_SECURITY_GROUP_RULE_CIDR}
-#出力値がマイIPになっているか確認
+```
+* 出力値がマイIPになっているか確認
+```
 ×××.×××.×××.×××/32
 ```
 
-上記の通り、"3. ルール追加"を再度実施
+上記の通り、3. ルール追加を再度実施
 ```
 aws ec2 authorize-security-group-ingress \
   --group-id ${EC2_SECURITY_GROUP_ID} \
@@ -332,7 +346,9 @@ EC2_VPC_ID=$( \
    --output text \
 ) \
 && echo ${EC2_VPC_ID}
-#設定したい"vpc-id"と一致するか確認
+```
+設定したい"vpc-id"と一致するか確認
+```
 vpc-XXXXXXXXXXXXXXXXX
 ```
 
@@ -346,21 +362,23 @@ EC2_SECURITY_GROUP_ID=$( \
     --output text \
 ) \
 && echo ${EC2_SECURITY_GROUP_ID}
-
-#設定したいsgのidが一致しているか確認
+```
+設定したいsgのidが一致しているか確認
+```
 sg-0xxxxxxxxxXXXXXXX
 ```
 * ⑨許可ソースをEC2のsgを許可するように変数を設定する。
+
+    * セキュリティグループのID（3306ポートを許可するEC2用に作成したセキュリティグループID）
 ```
-# セキュリティグループのID（3306ポートを許可するEC2用に作成したセキュリティグループID）
 EC2_SOURCE_SECURITY_GROUP_ID='sg-xxxxxxxx'
 ```
 
 3. 以下のコマンドを実行
-```
-#5行目”--cidr ${EC2_SECURITY_GROUP_RULE_CIDR}"を
-"--source-group ${EC2_SOURCE_SECURITY_GROUP_ID}"に変更
 
+* 5行目”--cidr ${EC2_SECURITY_GROUP_RULE_CIDR}"を
+"--source-group ${EC2_SOURCE_SECURITY_GROUP_ID}"に変更
+```
 aws ec2 authorize-security-group-ingress \
   --group-id ${EC2_SECURITY_GROUP_ID} \
   --protocol ${EC2_SECURITY_GROUP_RULE_PROTOCOL} \
@@ -381,3 +399,10 @@ ALBのセキュリティグループに関しては上記の工程を繰り返�
 コンソール上でも確認。
 ![](../images/securitygroup/sg3-1.png)
 ![](../images/securitygroup/sg3-2.png)
+
+#### 次回はこちら→[S3・EC2を作成](../cLI-command/cli-command-S3-EC2.md)
+
+#### 過去の記事→[CLIでVPCを作成](../cLI-command/cli-command-network.md)
+
+#### 参考サイト
+[Amazon VPCをAWS CLIで構築する手順②](https://zenn.dev/amarelo_n24/articles/30cb58cad805e8)
